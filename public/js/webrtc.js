@@ -116,13 +116,12 @@ function gotRemoteStream(event, id) {
   video.setAttribute("data-socket", id);
   video.srcObject = event.stream;
   video.autoplay = true;
-  video.muted = true;
+  video.muted = false;
   video.playsinline = true;
 
   if( event.stream.getAudioTracks().length > 0)
   console.log(event.stream.getAudioTracks()[0].enabled);
- // console.log(event.stream.getAudioTracks().)
-  else
+   else
   console.log('no audio');
 
   div.appendChild(video);
