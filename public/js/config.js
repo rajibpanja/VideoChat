@@ -1,3 +1,3 @@
 var config = {
-	host: 'http://localhost:3000'
+	host: 'https://videochatservice.azurewebsites.net/:3000'
 }
