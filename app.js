@@ -2,10 +2,13 @@ const express = require('express');
 const routes = require('routes');
 const http = require("http");
 const socketio = require("socket.io");
+const path = require('path');
 const port = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+const publicDirectoryPath = path.join(__dirname, './public')
+app.use(express.static(publicDirectoryPath))
 
 io.on('connection', function(socket){
 	

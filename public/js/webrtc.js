@@ -5,6 +5,7 @@ var socketId;
 var localStream;
 var connections = [];
 var socket;
+var remoteStream;
 
 var peerConnectionConfig = {
   iceServers: [
@@ -25,7 +26,8 @@ async function openUserMedia(e) {
     video: true,
     audio: true,
   });
-  localStream=stream;
+  localStream = stream;
+  remoteStream = new MediaStream();
   document.querySelector("#localVideo").srcObject = stream;
   document.querySelector("#cameraBtn").disabled = true;
   document.querySelector("#joinBtn").disabled = false;
@@ -41,64 +43,70 @@ function joinRoom() {
   document.querySelector("#hangupBtn").disabled = false;
   document.querySelector("#joinBtn").disabled = true;
   socket = io.connect(config.host, { secure: true });
-socket.on("signal", gotMessageFromServer);
-socket.on("connect", function () {
-  socketId = socket.id;
-  socket.on("user-left", function (id) {
-    var video = document.querySelector('[data-socket="' + id + '"]');
-    var parentDiv = video.parentElement;
-    video.parentElement.parentElement.removeChild(parentDiv);
-  });
-
-  socket.on("user-joined", function (id, count, clients) {
-    clients.forEach(function (socketListId) {
-      if (!connections[socketListId]) {
-        connections[socketListId] = new RTCPeerConnection(peerConnectionConfig);
-
-        //Wait for their ice candidate
-        connections[socketListId].onicecandidate = function () {
-          if (event.candidate != null) {
-            console.log("SENDING ICE");
-            socket.emit(
-              "signal",
-              socketListId,
-              JSON.stringify({ ice: event.candidate })
-            );
-          }
-        };
-
-        //Wait for their video stream
-        connections[socketListId].onaddstream = function () {
-          gotRemoteStream(event, socketListId);
-        };
-
-        //Add the local video stream
-        if(localStream!= null)
-        connections[socketListId].addStream(localStream);
-      }
+  socket.on("signal", gotMessageFromServer);
+  socket.on("connect", function () {
+    socketId = socket.id;
+    socket.on("user-left", function (id) {
+      var video = document.querySelector('[data-socket="' + id + '"]');
+      var parentDiv = video.parentElement;
+      video.parentElement.parentElement.removeChild(parentDiv);
     });
 
-    //Create an offer to connect with your local description
+    socket.on("user-joined", function (id, count, clients) {
+      clients.forEach(function (socketListId) {
+        if (!connections[socketListId]) {
+          connections[socketListId] = new RTCPeerConnection(
+            peerConnectionConfig
+          );
 
-    if (count >= 2) {
-      connections[id].createOffer().then(function (description) {
-        connections[id]
-          .setLocalDescription(description)
-          .then(function () {
-            socket.emit(
-              "signal",
-              id,
-              JSON.stringify({ sdp: connections[id].localDescription })
-            );
-          })
-          .catch((e) => console.log(e));
+          localStream.getTracks().forEach((track) => {
+            connections[socketListId].addTrack(track, localStream);
+          });
+
+          //Wait for their ice candidate
+          connections[socketListId].onicecandidate = function () {
+            if (event.candidate != null) {
+              console.log("SENDING ICE");
+              socket.emit(
+                "signal",
+                socketListId,
+                JSON.stringify({ ice: event.candidate })
+              );
+            }
+          };
+
+          // Wait for their video stream
+          connections[socketListId].onaddstream = function () {
+            gotRemoteStream(event, socketListId);
+          };
+
+         
+
+          //Add the local video stream
+          // if (localStream != null)
+          //   connections[socketListId].addStream(localStream);
+        }
       });
-    }
-  });
-});
-  
-}
 
+      //Create an offer to connect with your local description
+
+      if (count >= 2) {
+        connections[id].createOffer().then(function (description) {
+          connections[id]
+            .setLocalDescription(description)
+            .then(function () {
+              socket.emit(
+                "signal",
+                id,
+                JSON.stringify({ sdp: connections[id].localDescription })
+              );
+            })
+            .catch((e) => console.log(e));
+        });
+      }
+    });
+  });
+}
 
 function gotRemoteStream(event, id) {
   var videos = document.querySelectorAll("video"),
@@ -110,6 +118,12 @@ function gotRemoteStream(event, id) {
   video.autoplay = true;
   video.muted = true;
   video.playsinline = true;
+
+  if( event.stream.getAudioTracks().length > 0)
+  console.log(event.stream.getAudioTracks()[0].enabled);
+ // console.log(event.stream.getAudioTracks().)
+  else
+  console.log('no audio');
 
   div.appendChild(video);
   document.querySelector(".videos").appendChild(div);
