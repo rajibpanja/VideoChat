@@ -19,6 +19,12 @@ function init() {
   document.querySelector("#cameraBtn").addEventListener("click", openUserMedia);
   document.querySelector("#hangupBtn").addEventListener("click", hangUp);
   document.querySelector("#joinBtn").addEventListener("click", joinRoom);
+  document.querySelector("#volume_off").addEventListener("click", volume_off);
+  document.querySelector("#volume_up").addEventListener("click", volume_up);
+  document.querySelector("#videocam").addEventListener("click", videocam);
+  document
+    .querySelector("#videocam_off")
+    .addEventListener("click", videocam_off);
 }
 
 async function openUserMedia(e) {
@@ -31,17 +37,27 @@ async function openUserMedia(e) {
   document.querySelector("#localVideo").srcObject = stream;
   document.querySelector("#cameraBtn").disabled = true;
   document.querySelector("#joinBtn").disabled = false;
-  document.querySelector("#hangupBtn").disabled = true;
+  document.querySelector("#hangupBtn").disabled = false;
+  document.querySelector("#videocam").disabled = true;
+  document.querySelector("#videocam_off").disabled = false;
+  document.querySelector("#volume_up").disabled = true;
+  document.querySelector("#volume_off").disabled = false;
 }
 //close conference
 function hangUp() {
-  socket.close();
-  document.querySelector("#hangupBtn").disabled = false;
+  connections.forEach(function (socketListId) {
+    if (connections[socketListId] != null) {
+      connections[socketListId].close();
+    }
+  });
+  if (socket != null) socket.close();
+  location.reload();
 }
 
 function joinRoom() {
   document.querySelector("#hangupBtn").disabled = false;
   document.querySelector("#joinBtn").disabled = true;
+  document.querySelector("#volume_off").disabled = false;
   socket = io.connect(config.host, { secure: true });
   socket.on("signal", gotMessageFromServer);
   socket.on("connect", function () {
@@ -79,12 +95,6 @@ function joinRoom() {
           connections[socketListId].onaddstream = function () {
             gotRemoteStream(event, socketListId);
           };
-
-         
-
-          //Add the local video stream
-          // if (localStream != null)
-          //   connections[socketListId].addStream(localStream);
         }
       });
 
@@ -109,9 +119,9 @@ function joinRoom() {
 }
 
 function gotRemoteStream(event, id) {
-  var videos = document.querySelectorAll("video"),
-    video = document.createElement("video"),
-    div = document.createElement("div");
+  var video = document.createElement("video");
+  var div = document.createElement("div");
+  div.classList.add("col-md-3");
 
   video.setAttribute("data-socket", id);
   video.srcObject = event.stream;
@@ -119,13 +129,14 @@ function gotRemoteStream(event, id) {
   video.muted = false;
   video.playsinline = true;
 
-  if( event.stream.getAudioTracks().length > 0)
-  console.log(event.stream.getAudioTracks()[0].enabled);
-   else
-  console.log('no audio');
+  // if( event.stream.getAudioTracks().length > 0)
+  // console.log(event.stream.getAudioTracks()[0].enabled);
+  //  else
+  // console.log('no audio');
 
   div.appendChild(video);
-  document.querySelector(".videos").appendChild(div);
+  console.log(document.getElementById("videoContainer"));
+  document.getElementById("videoContainer").appendChild(div);
 }
 
 function gotMessageFromServer(fromId, message) {
@@ -167,6 +178,33 @@ function gotMessageFromServer(fromId, message) {
         .catch((e) => console.log(e));
     }
   }
+}
+
+function volume_off() {
+  document.querySelector("#volume_up").disabled = false;
+  document.querySelector("#volume_off").disabled = true;
+  localStream.getAudioTracks()[0].enabled = false;
+  
+  // document.getElementById("localVideo").muted = true;
+}
+
+function volume_up() {
+  document.querySelector("#volume_up").disabled = true;
+  document.querySelector("#volume_off").disabled = false;
+  document.getElementById("localVideo").muted = false;
+  localStream.getAudioTracks()[0].enabled = true;
+}
+
+function videocam_off() {
+  document.querySelector("#videocam").disabled = false;
+  document.querySelector("#videocam_off").disabled = true;
+  localStream.getVideoTracks()[0].enabled = false;
+}
+
+function videocam() {
+  document.querySelector("#videocam").disabled = true;
+  document.querySelector("#videocam_off").disabled = false;
+  localStream.getVideoTracks()[0].enabled = true;
 }
 
 init();

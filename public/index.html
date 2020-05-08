@@ -2,47 +2,76 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
     <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-
-    <link rel="stylesheet" href="./css/main.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" type="text/css" href="./css/material.css">
+    <link rel="stylesheet" href="css/main.css">
+
 </head>
 
-<body>
-    <div id="buttons">
-        <button class="mdc-button mdc-button--raised" id="cameraBtn">
-            <i class="material-icons mdc-button__icon" aria-hidden="true">perm_camera_mic</i>
-            <span class="mdc-button__label">Open camera & microphone</span>
-        </button>
-        <button class="mdc-button mdc-button--raised" disabled id="joinBtn">
-            <i class="material-icons mdc-button__icon" aria-hidden="true">group</i>
-            <span class="mdc-button__label">Join Conf</span>
-        </button>
-        <button class="mdc-button mdc-button--raised" disabled id="hangupBtn">
-            <i class="material-icons mdc-button__icon" aria-hidden="true">close</i>
-            <span class="mdc-button__label">Hangup</span>
-        </button>
-    </div>
+<wrapper class="d-flex flex-column">
+    <main class="container-fluid py-3 flex-fill">
+        <div class="container-fluid">
+            <div id="videoContainer" class="row">
+                <div class="col-md-3">
+                    <video id="localVideo" muted autoplay playsinline></video>
+                </div>
+            </div>
 
-    <div class="videos">
-        <div>
-            <video id="localVideo"  muted autoplay playsinline></video>
-            
+            <br />
+
         </div>
-    </div>
 
-    <br />
-    <div id="connections"></div>
+
+
+    </main>
+    <footer class="container-fluid w-100">
+        <div id="footer">
+
+            <div id="buttons" style="vertical-align: middle;">
+                <button class="mdc-button mdc-button--raised" id="cameraBtn">
+                    <i class="material-icons mdc-button__icon" aria-hidden="true">perm_camera_mic</i>
+                </button>
+                <button class="mdc-button mdc-button--raised" disabled id="joinBtn">
+                    <i class="material-icons mdc-button__icon" aria-hidden="true">group</i>
+
+                </button>
+                <button class="mdc-button mdc-button--raised" disabled id="hangupBtn">
+                    <i class="material-icons mdc-button__icon" aria-hidden="true">close</i>
+
+                </button>
+                <button class="mdc-button mdc-button--raised" disabled id="volume_off">
+                    <i class="material-icons mdc-button__icon" aria-hidden="true">volume_off</i>
+
+                </button>
+                <button class="mdc-button mdc-button--raised" disabled id="volume_up">
+                    <i class="material-icons mdc-button__icon" aria-hidden="true">volume_up</i>
+
+                </button>
+                <button class="mdc-button mdc-button--raised" disabled id="videocam">
+                    <i class="material-icons mdc-button__icon" aria-hidden="true">videocam</i>
+
+                </button>
+                <button class="mdc-button mdc-button--raised" disabled id="videocam_off">
+                    <i class=" material-icons mdc-button__icon" aria-hidden="true">videocam_off</i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </footer>
+
 
     <script src="socket.io/socket.io.js"></script>
     <script src="./js/config.js"></script>
     <script src="./js/webrtc.js"></script>
-
-    
-
-</body>
+</wrapper>
 
 </html>

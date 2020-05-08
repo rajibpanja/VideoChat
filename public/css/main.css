@@ -1,28 +1,45 @@
-/*.soundbar {
-	background-color: #CCC;
-	height: 20px;
-	width: 100%;
-	position: relative;
-}
-
-.currentVolume {
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 0;
-	height: 20px;
-	background-color: green;
-}
-*/
 .videos {
 	display: flex;
 	flex-wrap: wrap;
 }
 
-.videos > div {
-	width: 50%;
-}
+
 
 video {
 	width: 100%;
 }
+
+body,
+wrapper {
+    min-height: 100vh;
+    background-color:rgba(49, 48, 48, 0.89)
+}
+
+#canvas {
+    min-height: 100%;
+}
+
+#mainstage {
+    overflow: auto;
+}
+
+#footer {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    clear: both;
+    height: 10%;
+    margin-top: -151px;
+    font-size: 16;
+    text-rendering: auto;
+    position: fixed;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color:rgb(85, 83, 83);
+	text-align: center;
+	vertical-align: middle;
+}
+
+
+
+
