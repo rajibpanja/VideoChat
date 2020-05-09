@@ -1,5 +1,5 @@
 var config = {
-  //PROD
+    //PROD
 	host: 'https://videochatservice.azurewebsites.net'
 
 	//LOCAL

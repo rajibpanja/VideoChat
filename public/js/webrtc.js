@@ -58,8 +58,6 @@ async function openUserMedia(e) {
   joinRoom();
 }
 
-
-
 function joinRoom() {
   
   document.querySelector("#hangupBtn").disabled = false;
@@ -68,7 +66,6 @@ function joinRoom() {
 
   //connecting socket check config file for socket server URL
   socket = io.connect(config.host, { secure: true });
-  
   socket.on("connect", function () {
     socketId = socket.id;
 
@@ -78,23 +75,20 @@ function joinRoom() {
       var parentDiv = video.parentElement;
       video.parentElement.parentElement.removeChild(parentDiv);
     });
-    //////////////////////////////////////////////////////////////////////////////////////
-
-   
-    //When user joined received this event from socket server along with soketid of new joinee and list 
-    // of all connected socket client
+  ////////////////////////////////////////////////////////////////////////////////////////
+  //When user joined received this event from socket server along with soketid of new joinee and list 
+  // of all socket client
     socket.on("user-joined", function (id, count, clients) {
       clients.forEach(function (socketListId) {
         if (!connections[socketListId]) {
           connections[socketListId] = new RTCPeerConnection(peerConnectionConfig);
-          
-          
+          //Adding local video and audio track to all the clients peer connections         
           localStream.getTracks().forEach((track) => {
             connections[socketListId].addTrack(track, localStream);
           });
 
-          //Wait for their ice candidate
-          connections[socketListId].onicecandidate = function () {
+          //Wait for their ice candidate for establishing the peer connection
+          connections[socketListId].onicecandidate = function (event) {
             if (event.candidate != null) {
               console.log("SENDING ICE");
               socket.emit(
@@ -105,88 +99,70 @@ function joinRoom() {
             }
           };
 
-          // Wait for their video stream
+          // Register event for video stream
           connections[socketListId].onaddstream = function () {
             gotRemoteStream(event, socketListId);
           };
         }
       });
 
-      //Create an offer to connect with your local description
-
+      //Create an offer to connect with your browser
+      //when the connection established between two browser
       if (count >= 2) {
         connections[id].createOffer().then(function (description) {
-          connections[id]
-            .setLocalDescription(description)
-            .then(function () {
-              socket.emit(
-                "signal",
-                id,
-                JSON.stringify({ sdp: connections[id].localDescription })
-              );
-            })
-            .catch((e) => console.log(e));
+          connections[id].setLocalDescription(description).then(function () {
+              socket.emit("signal",id,JSON.stringify({ sdp: connections[id].localDescription }));
+                }).catch((e) => console.log(e));
         });
       }
     });
+///////////////////////////////////////USER JOINED EVENT CLOSED//////////////////////////////////////////////////////////////////////////
+    
   });
-
+  //Getting socket messages from PEER
   socket.on("signal", gotMessageFromServer);
 }
 
 function gotRemoteStream(event, id) {
+  console.log('got remote stream');
   var video = document.createElement("video");
   var div = document.createElement("div");
-  div.classList.add("col-md-4");
-  div.style.border = "2px solid #eee";
+  div.classList.add("col-md-3");
+  video.style.border = "2px solid #eee";
   div.style.padding= "0px";
   video.setAttribute("data-socket", id);
   video.srcObject = event.stream;
   video.autoplay = true;
   video.muted = false;
   video.playsinline = true;
-
   div.appendChild(video);
   document.getElementById("videoContainer").appendChild(div);
 }
 
 function gotMessageFromServer(fromId, message) {
+  
+  console.log('got message from server');
   //Parse the incoming signal
   var signal = JSON.parse(message);
 
   //Make sure it's not coming from yourself
   if (fromId != socketId) {
     if (signal.sdp) {
-      connections[fromId]
-        .setRemoteDescription(new RTCSessionDescription(signal.sdp))
+      connections[fromId].setRemoteDescription(new RTCSessionDescription(signal.sdp))
         .then(function () {
           if (signal.sdp.type == "offer") {
-            connections[fromId]
-              .createAnswer()
-              .then(function (description) {
-                connections[fromId]
-                  .setLocalDescription(description)
+            connections[fromId].createAnswer().then(function (description) {
+                connections[fromId].setLocalDescription(description)
                   .then(function () {
-                    socket.emit(
-                      "signal",
-                      fromId,
-                      JSON.stringify({
-                        sdp: connections[fromId].localDescription,
-                      })
-                    );
-                  })
-                  .catch((e) => console.log(e));
-              })
-              .catch((e) => console.log(e));
+                    socket.emit("signal",fromId,JSON.stringify({sdp: connections[fromId].localDescription}));
+                  }).catch((e) => console.log(e));
+              }).catch((e) => console.log(e));
           }
-        })
-        .catch((e) => console.log(e));
+        }).catch((e) => console.log(e));
     }
 
     if (signal.ice) {
-      connections[fromId]
-        .addIceCandidate(new RTCIceCandidate(signal.ice))
-        .catch((e) => console.log(e));
+      connections[fromId].addIceCandidate(new RTCIceCandidate(signal.ice)).then().catch((e) => console.log(e));
     }
   }
 }
