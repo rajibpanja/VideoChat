@@ -124,14 +124,19 @@ function joinRoom() {
 }
 
 function gotRemoteStream(event, id) {
+
   console.log('got remote stream');
   var video = document.createElement("video");
   var div = document.createElement("div");
   div.classList.add("col-md-3");
-  video.style.border = "2px solid #eee";
+  
   div.style.padding= "0px";
   video.setAttribute("data-socket", id);
+  if(event.stream!= null)
+  {
   video.srcObject = event.stream;
+  video.style.border = "2px solid #eee";
+  }
   video.autoplay = true;
   video.muted = false;
   video.playsinline = true;
