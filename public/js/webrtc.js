@@ -23,6 +23,8 @@ function init() {
   document.querySelector("#volume_up").addEventListener("click", volume_up);
   document.querySelector("#videocam").addEventListener("click", videocam);
   document.querySelector("#videocam_off").addEventListener("click", videocam_off);
+
+  window.addEventListener('resize', resizeVideoTiles);
 }
 
 //Close conference from your browser
@@ -39,27 +41,26 @@ function hangUp() {
 //Open Microphone and Camera from your browser
 async function openUserMedia(e) {
   const stream = await navigator.mediaDevices.getUserMedia({
-    video:true,
+    video: true,
     audio: true,
   });
 
   localStream = stream;
   remoteStream = new MediaStream();
-  document.querySelector("#localVideo").srcObject = stream;
-  document.querySelector("#localVideo").style="border:2px solid #eee"; 
-  document.querySelector("#videocam").style.display = "none";
-  document.querySelector("#videocam_off").style.display = "block";
-  document.querySelector("#volume_up").style.display = "none";
-  document.querySelector("#volume_off").style.display = "block";
-  document.querySelector("#hangupBtn").style.display = "block";
-  document.querySelector("#joinBtn").style.display = "none";
+  document.querySelector("#self-video").srcObject = stream;
+  document.querySelector("#videocam").classList.add('d-none');
+  document.querySelector("#videocam_off").classList.remove('d-none');
+  document.querySelector("#volume_up").classList.add('d-none');
+  document.querySelector("#volume_off").classList.remove('d-none');
+  document.querySelector("#hangupBtn").classList.remove('d-none');
+  document.querySelector("#joinBtn").classList.add('d-none');
 
   //Join conferecne call and send the peer connection details to other participent via SOCKET request
   joinRoom();
 }
 
 function joinRoom() {
-  
+
   document.querySelector("#hangupBtn").disabled = false;
   document.querySelector("#joinBtn").disabled = true;
   document.querySelector("#volume_off").disabled = false;
@@ -75,9 +76,9 @@ function joinRoom() {
       var parentDiv = video.parentElement;
       video.parentElement.parentElement.removeChild(parentDiv);
     });
-  ////////////////////////////////////////////////////////////////////////////////////////
-  //When user joined received this event from socket server along with soketid of new joinee and list 
-  // of all socket client
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //When user joined received this event from socket server along with soketid of new joinee and list 
+    // of all socket client
     socket.on("user-joined", function (id, count, clients) {
       clients.forEach(function (socketListId) {
         if (!connections[socketListId]) {
@@ -111,13 +112,13 @@ function joinRoom() {
       if (count >= 2) {
         connections[id].createOffer().then(function (description) {
           connections[id].setLocalDescription(description).then(function () {
-              socket.emit("signal",id,JSON.stringify({ sdp: connections[id].localDescription }));
-                }).catch((e) => console.log(e));
+            socket.emit("signal", id, JSON.stringify({ sdp: connections[id].localDescription }));
+          }).catch((e) => console.log(e));
         });
       }
     });
-///////////////////////////////////////USER JOINED EVENT CLOSED//////////////////////////////////////////////////////////////////////////
-    
+    ///////////////////////////////////////USER JOINED EVENT CLOSED//////////////////////////////////////////////////////////////////////////
+
   });
   //Getting socket messages from PEER
   socket.on("signal", gotMessageFromServer);
@@ -128,24 +129,45 @@ function gotRemoteStream(event, id) {
   console.log('got remote stream');
   var video = document.createElement("video");
   var div = document.createElement("div");
-  div.classList.add("col-md-3");
-  
-  div.style.padding= "0px";
+  div.classList.add("video-container", "pr-1", "pb-1");
+
   video.setAttribute("data-socket", id);
-  if(event.stream!= null)
-  {
-  video.srcObject = event.stream;
-  video.style.border = "2px solid #eee";
+  if (event.stream != null) {
+    video.srcObject = event.stream;
+    video.classList.add('d-block', 'w-100', 'h-100');
   }
   video.autoplay = true;
   video.muted = false;
   video.playsinline = true;
   div.appendChild(video);
-  document.getElementById("videoContainer").appendChild(div);
+  document.getElementById("video-panel").appendChild(div);
+
+  resizeVideoTiles();
+}
+
+function resizeVideoTiles() {
+  const tileElms = document.querySelectorAll('.video-container');
+  if (tileElms) {
+    const availWidth = document.querySelector('#video-panel-container').clientWidth;
+    const availHeight = document.querySelector('#video-panel-container').clientHeight;
+    const maxTilesPerRow = Math.ceil(Math.sqrt(tileElms.length));
+    const maxRows = Math.ceil(tileElms.length / maxTilesPerRow);
+    const evalTileWidth = availWidth / maxTilesPerRow, evalTileHeight = availHeight / maxRows;
+    const aspectTileWidth = evalTileHeight * 4 / 3; //(4:3 aspect ratio)
+    let targetTileWidth = aspectTileWidth, targetTileHeight = evalTileHeight;
+    if (aspectTileWidth > evalTileWidth) {
+      targetTileWidth = evalTileWidth;
+      targetTileHeight = evalTileHeight - ((aspectTileWidth - evalTileWidth) * 3 / 4); //(4:3 aspect ratio)
+    }
+    tileElms.forEach(tileElm => {
+      tileElm.style.width = targetTileWidth + 'px';
+      tileElm.style.height = targetTileHeight + 'px';
+    });
+  }
 }
 
 function gotMessageFromServer(fromId, message) {
-  
+
   console.log('got message from server');
   //Parse the incoming signal
   var signal = JSON.parse(message);
@@ -157,11 +179,11 @@ function gotMessageFromServer(fromId, message) {
         .then(function () {
           if (signal.sdp.type == "offer") {
             connections[fromId].createAnswer().then(function (description) {
-                connections[fromId].setLocalDescription(description)
-                  .then(function () {
-                    socket.emit("signal",fromId,JSON.stringify({sdp: connections[fromId].localDescription}));
-                  }).catch((e) => console.log(e));
-              }).catch((e) => console.log(e));
+              connections[fromId].setLocalDescription(description)
+                .then(function () {
+                  socket.emit("signal", fromId, JSON.stringify({ sdp: connections[fromId].localDescription }));
+                }).catch((e) => console.log(e));
+            }).catch((e) => console.log(e));
           }
         }).catch((e) => console.log(e));
     }
@@ -174,26 +196,26 @@ function gotMessageFromServer(fromId, message) {
 
 function volume_off() {
   localStream.getAudioTracks()[0].enabled = false;
-  document.querySelector("#volume_up").style.display = "block";
-  document.querySelector("#volume_off").style.display = "none";
+  document.querySelector("#volume_up").classList.remove('d-none');
+  document.querySelector("#volume_off").classList.add('d-none');
 }
 
 function volume_up() {
-  document.getElementById("localVideo").muted = false;
+  document.getElementById("self-video").muted = false;
   localStream.getAudioTracks()[0].enabled = true;
-  document.querySelector("#volume_up").style.display = "none";
-  document.querySelector("#volume_off").style.display = "block";
+  document.querySelector("#volume_up").classList.add('d-none');
+  document.querySelector("#volume_off").classList.remove('d-none');
 }
 
 function videocam_off() {
   localStream.getVideoTracks()[0].enabled = false;
-  document.querySelector("#videocam").style.display = "block";
-  document.querySelector("#videocam_off").style.display = "none";
+  document.querySelector("#videocam").classList.remove('d-none');
+  document.querySelector("#videocam_off").classList.add('d-none');
 }
 
 function videocam() {
-  document.querySelector("#videocam").style.display = "none";
-  document.querySelector("#videocam_off").style.display = "block";
+  document.querySelector("#videocam").classList.add('d-none');
+  document.querySelector("#videocam_off").classList.remove('d-none');
   localStream.getVideoTracks()[0].enabled = true;
 }
 

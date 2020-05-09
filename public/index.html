@@ -2,84 +2,72 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="css/main.css">
+	<title>Video Conference</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+	<link rel="stylesheet" href="css/main.css">
 </head>
-<wrapper class="d-flex flex-column">
-    <main class="container-fluid py-3 flex-fill">
-        <div class="container-fluid">
-            <div id="videoContainer" class="row">
-                <div id="localvideodiv" class="col-md-3" style="padding: 0px;">
-                    <video id="localVideo" muted autoplay playsinline style="width: 100%;"></video>
-                </div>
-            </div>
 
-            <br />
+<body class="bg-dark">
+	<main id="main" class="pt-1 pl-1">
+		<div id="video-panel-container">
+			<div id="video-panel" class="d-flex align-items-center justify-content-center flex-wrap">
+				<div class="video-container pr-1 pb-1">
+					<video id="self-video" muted autoplay playsinline class="d-block w-100 h-100"></video>
+				</div>
+			</div>
+		</div>
+	</main>
+	<footer id="footer" class="position-fixed w-100 p-3">
+		<div class="d-flex align-items-center justify-content-center">
+			<button class="btn btn-primary rounded-circle video-action" id="joinBtn">
+				<div class="d-flex flex-column">
+					<i class="material-icons">group</i>
+					<div class="small">JOIN</div>
+				</div>
+			</button>
+			<button class="btn btn-success rounded-circle video-action mr-2 d-none" id="volume_off">
+				<div class="d-flex flex-column">
+					<i class="material-icons">volume_off</i>
+					<div class="small">MUTE</div>
+				</div>
+			</button>
+			<button class="btn btn-danger rounded-circle video-action mr-2 d-none" id="volume_up">
+				<div class="d-flex flex-column">
+					<i class="material-icons">volume_up</i>
+					<div class="small">AUDIO</div>
+				</div>
+			</button>
+			<button class="btn btn-danger rounded-circle video-action mr-2 d-none" id="videocam">
+				<div class="d-flex flex-column">
+					<i class="material-icons">videocam</i>
+					<div class="small">VIDEO</div>
+				</div>
+			</button>
+			<button class="btn btn-success rounded-circle video-action mr-2 d-none" id="videocam_off">
+				<div class="d-flex flex-column">
+					<i class="material-icons">videocam_off</i>
+					<div class="small">HIDE</div>
+				</div>
+			</button>
+			<button class="btn btn-danger rounded-circle video-action d-none" id="hangupBtn">
+				<div class="d-flex flex-column">
+					<i class="material-icons">close</i>
+					<div class="small">EXIT</div>
+				</div>
+			</button>
+		</div>
+	</footer>
 
-        </div>
-    </main>
-    <footer class="container-fluid">
-
-        <div id="footer">
-            <div style="display:flex;justify-content: center; align-items: center;">
-                <button class="mdc-button mdc-button--raised" id="joinBtn">
-                    <div>
-                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">group</i>
-                        <div>join</div>
-                    </div>
-                </button>
-                <button class="mdc-button mdc-button--raised" style="display: none;" id="hangupBtn">
-                    <div>
-                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">close</i>
-                        <div>close</div>
-                    </div>
-                </button>
-
-                <button class="mdc-button mdc-button--raised" style="display: none;" id="volume_off">
-                    <div>
-                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">volume_off</i>
-                        <div>mute</div>
-                    </div>
-                </button>
-                <button class="mdc-button mdc-button--raised" style="display: none;" id="volume_up">
-                    <div>
-                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">volume_up</i>
-                        <div>Audio</div>
-                    </div>
-                </button>
-
-                <button class="mdc-button mdc-button--raised" style="display: none;" id="videocam">
-                    <div>
-                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">videocam</i>
-                        <div>camera on</div>
-                    </div>
-                </button>
-                <button class="mdc-button mdc-button--raised" style="display: none;" id="videocam_off">
-                    <div>
-                        <i class=" material-icons mdc-button__icon" style="margin:0px"
-                            aria-hidden="true">videocam_off</i>
-                        <div>camera off</div>
-                    </div>
-                </button>
-
-
-            </div>
-
-        </div>
-
-    </footer>
-
-
-    <script src="socket.io/socket.io.js"></script>
-    <script src="./js/config.js"></script>
-    <script src="./js/webrtc.js"></script>
-</wrapper>
+	<script src="socket.io/socket.io.js"></script>
+	<script src="./js/config.js"></script>
+	<script src="./js/webrtc.js"></script>
+</body>
 
 </html>
