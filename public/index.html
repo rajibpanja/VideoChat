@@ -7,60 +7,68 @@
     <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
     <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-    <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="css/main.css">
 
 </head>
-
 <wrapper class="d-flex flex-column">
     <main class="container-fluid py-3 flex-fill">
         <div class="container-fluid">
             <div id="videoContainer" class="row">
-                <div class="col-md-3">
-                    <video id="localVideo" muted autoplay playsinline></video>
+                <div class="col-md-4" style="border:2px solid #eee; padding: 0px;">
+                    <video id="localVideo" muted autoplay playsinline style="width: 100%;"></video>
                 </div>
             </div>
 
             <br />
 
         </div>
-
-
-
     </main>
-    <footer class="container-fluid w-100">
+    <footer class="container-fluid">
+
         <div id="footer">
-
-            <div id="buttons" style="vertical-align: middle;">
-                <button class="mdc-button mdc-button--raised" id="cameraBtn">
-                    <i class="material-icons mdc-button__icon" aria-hidden="true">perm_camera_mic</i>
+            <div style="display:flex;justify-content: center; align-items: center;">
+                <button class="mdc-button mdc-button--raised" id="joinBtn">
+                    <div>
+                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">group</i>
+                        <div>join</div>
+                    </div>
                 </button>
-                <button class="mdc-button mdc-button--raised" disabled id="joinBtn">
-                    <i class="material-icons mdc-button__icon" aria-hidden="true">group</i>
-
+                <button class="mdc-button mdc-button--raised" style="display: none;" id="hangupBtn">
+                    <div>
+                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">close</i>
+                        <div>close</div>
+                    </div>
                 </button>
-                <button class="mdc-button mdc-button--raised" disabled id="hangupBtn">
-                    <i class="material-icons mdc-button__icon" aria-hidden="true">close</i>
 
+                <button class="mdc-button mdc-button--raised" style="display: none;" id="volume_off">
+                    <div>
+                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">volume_off</i>
+                        <div>mute</div>
+                    </div>
                 </button>
-                <button class="mdc-button mdc-button--raised" disabled id="volume_off">
-                    <i class="material-icons mdc-button__icon" aria-hidden="true">volume_off</i>
+                <button class="mdc-button mdc-button--raised" style="display: none;" id="volume_up">
+                    <div>
+                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">volume_up</i>
+                        <div>Audio</div>
+                    </div>
+                </button>
 
+                <button class="mdc-button mdc-button--raised" style="display: none;" id="videocam">
+                    <div>
+                        <i class="material-icons mdc-button__icon" style="margin:0px" aria-hidden="true">videocam</i>
+                        <div>camera on</div>
+                    </div>
                 </button>
-                <button class="mdc-button mdc-button--raised" disabled id="volume_up">
-                    <i class="material-icons mdc-button__icon" aria-hidden="true">volume_up</i>
+                <button class="mdc-button mdc-button--raised" style="display: none;" id="videocam_off">
+                    <div>
+                        <i class=" material-icons mdc-button__icon" style="margin:0px"
+                            aria-hidden="true">videocam_off</i>
+                        <div>camera off</div>
+                    </div>
+                </button>
 
-                </button>
-                <button class="mdc-button mdc-button--raised" disabled id="videocam">
-                    <i class="material-icons mdc-button__icon" aria-hidden="true">videocam</i>
-
-                </button>
-                <button class="mdc-button mdc-button--raised" disabled id="videocam_off">
-                    <i class=" material-icons mdc-button__icon" aria-hidden="true">videocam_off</i>
-
-                </button>
 
             </div>
 

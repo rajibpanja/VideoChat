@@ -27,17 +27,13 @@ wrapper {
     left: 0;
     bottom: 0;
     width: 100%;
-    clear: both;
     height: 10%;
     margin-top: -151px;
-    font-size: 16;
-    text-rendering: auto;
     position: fixed;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-color:rgb(85, 83, 83);
-	text-align: center;
-	vertical-align: middle;
+		
 }
 
 
