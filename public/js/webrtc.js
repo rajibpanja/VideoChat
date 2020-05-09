@@ -78,12 +78,15 @@ function joinRoom() {
     });
     ////////////////////////////////////////////////////////////////////////////////////////
     //When user joined received this event from socket server along with soketid of new joinee and list 
+    //When user joined received this event from socket server along with soketid of new joinee and list
     // of all socket client
     socket.on("user-joined", function (id, count, clients) {
       clients.forEach(function (socketListId) {
         if (!connections[socketListId]) {
-          connections[socketListId] = new RTCPeerConnection(peerConnectionConfig);
-          //Adding local video and audio track to all the clients peer connections         
+          connections[socketListId] = new RTCPeerConnection(
+            peerConnectionConfig
+          );
+          //Adding local video and audio track to all the clients peer connections
           localStream.getTracks().forEach((track) => {
             connections[socketListId].addTrack(track, localStream);
           });
@@ -167,15 +170,15 @@ function resizeVideoTiles() {
 }
 
 function gotMessageFromServer(fromId, message) {
-
-  console.log('got message from server');
+  console.log("got message from server");
   //Parse the incoming signal
   var signal = JSON.parse(message);
 
   //Make sure it's not coming from yourself
   if (fromId != socketId) {
     if (signal.sdp) {
-      connections[fromId].setRemoteDescription(new RTCSessionDescription(signal.sdp))
+      connections[fromId]
+        .setRemoteDescription(new RTCSessionDescription(signal.sdp))
         .then(function () {
           if (signal.sdp.type == "offer") {
             connections[fromId].createAnswer().then(function (description) {
@@ -185,11 +188,15 @@ function gotMessageFromServer(fromId, message) {
                 }).catch((e) => console.log(e));
             }).catch((e) => console.log(e));
           }
-        }).catch((e) => console.log(e));
+        })
+        .catch((e) => console.log(e));
     }
 
     if (signal.ice) {
-      connections[fromId].addIceCandidate(new RTCIceCandidate(signal.ice)).then().catch((e) => console.log(e));
+      connections[fromId]
+        .addIceCandidate(new RTCIceCandidate(signal.ice))
+        .then()
+        .catch((e) => console.log(e));
     }
   }
 }
