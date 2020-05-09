@@ -46,6 +46,7 @@ async function openUserMedia(e) {
   localStream = stream;
   remoteStream = new MediaStream();
   document.querySelector("#localVideo").srcObject = stream;
+  document.querySelector("#localVideo").style="border:2px solid #eee"; 
   document.querySelector("#videocam").style.display = "none";
   document.querySelector("#videocam_off").style.display = "block";
   document.querySelector("#volume_up").style.display = "none";
