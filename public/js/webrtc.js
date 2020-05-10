@@ -140,7 +140,7 @@ function gotRemoteStream(event, id) {
   console.log('got remote stream');
   var video = document.createElement("video");
   var div = document.createElement("div");
-  div.classList.add("video-tile", "pr-1", "pb-1");
+  div.classList.add("video-tile", "m-1");
 
   video.setAttribute("data-socket", id);
   if (event.stream != null) {
