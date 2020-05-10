@@ -47,7 +47,8 @@ async function openUserMedia(e) {
 
   localStream = stream;
   remoteStream = new MediaStream();
-  document.querySelector("#self-video").srcObject = stream;
+  const selfVideoElm = document.querySelector("#self-video");
+  selfVideoElm.srcObject = stream;
   document.querySelector("#videocam").classList.add('d-none');
   document.querySelector("#videocam_off").classList.remove('d-none');
   document.querySelector("#volume_up").classList.add('d-none');
@@ -57,7 +58,7 @@ async function openUserMedia(e) {
 
   //Join conferecne call and send the peer connection details to other participent via SOCKET request
   joinRoom();
-  resizeVideoTiles();
+  selfVideoElm.onloadeddata = () => { resizeVideoTiles() }
 }
 
 function joinRoom() {
@@ -71,7 +72,7 @@ function joinRoom() {
   socket.on("connect", function () {
     socketId = socket.id;
 
-     socket.emit('userdetails','rajib panja');
+    socket.emit('userdetails', 'rajib panja');
     //Remove video element from your browser if received userleft emit from socekt server
     socket.on("user-left", function (id) {
       var video = document.querySelector('[data-socket="' + id + '"]');
@@ -152,24 +153,39 @@ function gotRemoteStream(event, id) {
   div.appendChild(video);
   document.getElementById("video-panel").appendChild(div);
 
-  resizeVideoTiles();
+  video.onloadeddata = () => { resizeVideoTiles() }
 }
 
 function resizeVideoTiles() {
   const tileElms = document.querySelectorAll('.video-container');
   if (tileElms) {
-    const availWidth = document.querySelector('#video-panel-container').clientWidth;
-    const availHeight = document.querySelector('#video-panel-container').clientHeight;
-    const maxTilesPerRow = Math.ceil(Math.sqrt(tileElms.length));
-    const maxRows = Math.ceil(tileElms.length / maxTilesPerRow);
-    const evalTileWidth = availWidth / maxTilesPerRow, evalTileHeight = availHeight / maxRows;
-    const aspectTileWidth = evalTileHeight * 4 / 3; //(4:3 aspect ratio)
-    let targetTileWidth = aspectTileWidth, targetTileHeight = evalTileHeight;
-    if (aspectTileWidth > evalTileWidth) {
-      targetTileWidth = evalTileWidth;
-      targetTileHeight = evalTileHeight - ((aspectTileWidth - evalTileWidth) * 3 / 4); //(4:3 aspect ratio)
-    }
+    const
+      availWidth = document.querySelector('#video-panel-container').clientWidth,
+      availHeight = document.querySelector('#video-panel-container').clientHeight,
+      maxTilesPerRow = Math.ceil(Math.sqrt(tileElms.length)), maxRows = Math.ceil(tileElms.length / maxTilesPerRow),
+      evalTileWidth = availWidth / maxTilesPerRow, evalTileHeight = availHeight / maxRows;
+    let targetTileWidth = 0, targetTileHeight = 0;
     tileElms.forEach(tileElm => {
+      const
+        videoElm = tileElm.querySelector('video'),
+        aspectRatio = videoElm.videoWidth / videoElm.videoHeight;
+      if (aspectRatio > 1) {
+        if (evalTileHeight < evalTileWidth / aspectRatio) {
+          targetTileHeight = evalTileHeight;
+          targetTileWidth = evalTileHeight * aspectRatio;
+        } else {
+          targetTileWidth = evalTileWidth;
+          targetTileHeight = evalTileWidth / aspectRatio;
+        }
+      } else {
+        if (evalTileWidth < evalTileHeight * aspectRatio) {
+          targetTileWidth = evalTileWidth;
+          targetTileHeight = evalTileWidth / aspectRatio;
+        } else {
+          targetTileHeight = evalTileHeight;
+          targetTileWidth = evalTileHeight * aspectRatio;
+        }
+      }
       tileElm.style.width = targetTileWidth + 'px';
       tileElm.style.height = targetTileHeight + 'px';
     });
