@@ -192,7 +192,7 @@ function resizeVideoTiles() {
       tileElm.style.width = targetTileWidth + 'px';
       tileElm.style.height = targetTileHeight + 'px';
       if (!renderedTileMinHeight || renderedTileMinHeight > targetTileHeight) {
-        renderedTileMinHeight = targetTileHeight;
+        renderedTileMinHeight = Math.floor(targetTileHeight);
       }
     });
     tileElms.forEach(tileElm => {
@@ -201,12 +201,7 @@ function resizeVideoTiles() {
         const
           videoElm = tileElm.querySelector('video'),
           aspectRatio = videoElm.videoWidth / videoElm.videoHeight;
-        let targetTileWidth = 0;
-        if (aspectRatio > 1) {
-          targetTileWidth = renderedTileMinHeight * aspectRatio;
-        } else {
-          targetTileWidth = renderedTileMinHeight / aspectRatio;
-        }
+        let targetTileWidth = renderedTileMinHeight * aspectRatio;
         tileElm.style.width = targetTileWidth + 'px';
         tileElm.style.height = renderedTileMinHeight + 'px';
       }
