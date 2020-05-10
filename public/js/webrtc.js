@@ -57,6 +57,7 @@ async function openUserMedia(e) {
 
   //Join conferecne call and send the peer connection details to other participent via SOCKET request
   joinRoom();
+  resizeVideoTiles();
 }
 
 function joinRoom() {
@@ -75,6 +76,8 @@ function joinRoom() {
       var video = document.querySelector('[data-socket="' + id + '"]');
       var parentDiv = video.parentElement;
       video.parentElement.parentElement.removeChild(parentDiv);
+
+      resizeVideoTiles();
     });
     ////////////////////////////////////////////////////////////////////////////////////////
     //When user joined received this event from socket server along with soketid of new joinee and list 
