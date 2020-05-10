@@ -196,8 +196,8 @@ function resizeVideoTiles() {
       }
     });
     tileElms.forEach(tileElm => {
-      const tileWidth = tileElm.offsetWidth;
-      if (tileWidth > renderedTileMinHeight) {
+      const tileHeight = tileElm.offsetHeight;
+      if (tileHeight > renderedTileMinHeight) {
         const
           videoElm = tileElm.querySelector('video'),
           aspectRatio = videoElm.videoWidth / videoElm.videoHeight;
