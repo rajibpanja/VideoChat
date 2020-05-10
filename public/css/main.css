@@ -1,41 +1,14 @@
-.videos {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-
-
-video {
-	width: 100%;
-}
-
-body,
-wrapper {
-    min-height: 100vh;
-    background-color:rgba(49, 48, 48, 0.89)
-}
-
-#canvas {
-    min-height: 100%;
-}
-
-#mainstage {
-    overflow: auto;
+#video-panel-container {
+  height: calc(100vh - 6rem);
 }
 
 #footer {
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 10%;
-    margin-top: -151px;
-    position: fixed;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-color:rgb(85, 83, 83);
-		
+  left: 0;
+  bottom: 0;
+  height: 6rem;
 }
 
-
-
-
+.video-action {
+  width: 4rem;
+  height: 4rem;
+}
