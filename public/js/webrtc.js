@@ -153,7 +153,10 @@ function gotRemoteStream(event, id) {
   div.appendChild(video);
   document.getElementById("video-panel").appendChild(div);
 
-  video.onloadeddata = () => { resizeVideoTiles() }
+  video.onloadeddata = (e) => {
+    e.target.play();
+    resizeVideoTiles();
+  }
 }
 
 function resizeVideoTiles() {
