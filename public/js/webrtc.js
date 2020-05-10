@@ -140,7 +140,7 @@ function gotRemoteStream(event, id) {
   console.log('got remote stream');
   var video = document.createElement("video");
   var div = document.createElement("div");
-  div.classList.add("video-container", "pr-1", "pb-1");
+  div.classList.add("video-tile", "pr-1", "pb-1");
 
   video.setAttribute("data-socket", id);
   if (event.stream != null) {
@@ -160,14 +160,14 @@ function gotRemoteStream(event, id) {
 }
 
 function resizeVideoTiles() {
-  const tileElms = document.querySelectorAll('.video-container');
+  const tileElms = document.querySelectorAll('.video-tile');
   if (tileElms) {
     const
       availWidth = document.querySelector('#video-panel-container').clientWidth,
       availHeight = document.querySelector('#video-panel-container').clientHeight,
       maxTilesPerRow = Math.ceil(Math.sqrt(tileElms.length)), maxRows = Math.ceil(tileElms.length / maxTilesPerRow),
       evalTileWidth = availWidth / maxTilesPerRow, evalTileHeight = availHeight / maxRows;
-    let targetTileWidth = 0, targetTileHeight = 0;
+    let targetTileWidth = 0, targetTileHeight = 0, renderedTileMinHeight = 0;
     tileElms.forEach(tileElm => {
       const
         videoElm = tileElm.querySelector('video'),
@@ -191,6 +191,25 @@ function resizeVideoTiles() {
       }
       tileElm.style.width = targetTileWidth + 'px';
       tileElm.style.height = targetTileHeight + 'px';
+      if (!renderedTileMinHeight || renderedTileMinHeight > targetTileHeight) {
+        renderedTileMinHeight = targetTileHeight;
+      }
+    });
+    tileElms.forEach(tileElm => {
+      const tileWidth = tileElm.offsetWidth;
+      if (tileWidth > renderedTileMinHeight) {
+        const
+          videoElm = tileElm.querySelector('video'),
+          aspectRatio = videoElm.videoWidth / videoElm.videoHeight;
+        let targetTileWidth = 0;
+        if (aspectRatio > 1) {
+          targetTileWidth = renderedTileMinHeight * aspectRatio;
+        } else {
+          targetTileWidth = renderedTileMinHeight / aspectRatio;
+        }
+        tileElm.style.width = targetTileWidth + 'px';
+        tileElm.style.height = renderedTileMinHeight + 'px';
+      }
     });
   }
 }
