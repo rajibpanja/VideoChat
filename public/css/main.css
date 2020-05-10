@@ -1,14 +1,24 @@
+#join-room-box {
+  width: 100%;
+}
+
 #video-panel-container {
   height: calc(100vh - 6rem);
 }
 
-#footer {
+#video-panel-footer {
   left: 0;
   bottom: 0;
   height: 6rem;
 }
 
-.video-action {
+.video-panel-action {
   width: 4rem;
   height: 4rem;
+}
+
+@media only screen and (min-width: 992px) {
+  #join-room-box {
+    width: 50%;
+  }
 }
