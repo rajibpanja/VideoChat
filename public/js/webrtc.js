@@ -22,9 +22,11 @@ function init() {
   document.querySelector("#volume_off").addEventListener("click", volume_off);
   document.querySelector("#volume_up").addEventListener("click", volume_up);
   document.querySelector("#videocam").addEventListener("click", videocam);
-  document.querySelector("#videocam_off").addEventListener("click", videocam_off);
+  document
+    .querySelector("#videocam_off")
+    .addEventListener("click", videocam_off);
 
-  window.addEventListener('resize', resizeVideoTiles);
+  window.addEventListener("resize", resizeVideoTiles);
 }
 
 //Close conference from your browser
@@ -35,6 +37,7 @@ function hangUp() {
     }
   });
   if (socket != null) socket.close();
+  //NEED TO DO --RUPAM
   location.reload();
 }
 
@@ -49,20 +52,42 @@ async function openUserMedia(e) {
   remoteStream = new MediaStream();
   const selfVideoElm = document.querySelector("#self-video");
   selfVideoElm.srcObject = stream;
-  document.querySelector("#videocam").classList.add('d-none');
-  document.querySelector("#videocam_off").classList.remove('d-none');
-  document.querySelector("#volume_up").classList.add('d-none');
-  document.querySelector("#volume_off").classList.remove('d-none');
-  document.querySelector("#hangupBtn").classList.remove('d-none');
-  document.querySelector("#joinBtn").classList.add('d-none');
+  document.querySelector("#videocam").classList.add("d-none");
+  document.querySelector("#videocam_off").classList.remove("d-none");
+  document.querySelector("#volume_up").classList.add("d-none");
+  document.querySelector("#volume_off").classList.remove("d-none");
+  document.querySelector("#hangupBtn").classList.remove("d-none");
+  document.querySelector("#joinBtn").classList.add("d-none");
 
   //Join conferecne call and send the peer connection details to other participent via SOCKET request
-  joinRoom();
-  selfVideoElm.onloadeddata = () => { resizeVideoTiles() }
+  joinRoom(document.getElementById("tbxroomid").value);
+  selfVideoElm.onloadeddata = () => {
+    resizeVideoTiles();
+  };
 }
 
-function joinRoom() {
+function createRoom() {
+  //connecting socket check config file for socket server URL
+  var room=0;
+  socket = io.connect(config.host, { secure: true });
+  socket.on("connect", function () {
+    socket.emit("RoomCreate");
+    socket.on("RoomNumber", function (roomNumber) {
+      
+      room=roomNumber;
+      
+    });
+   
+  });
+  //Setting time interval for populate the value 
+  setTimeout (()=>{
+    socket.disconnect();
+    alert(room);
+  },2000);
+    
+}
 
+function joinRoom(roomNumber) {
   document.querySelector("#hangupBtn").disabled = false;
   document.querySelector("#joinBtn").disabled = true;
   document.querySelector("#volume_off").disabled = false;
@@ -71,18 +96,20 @@ function joinRoom() {
   socket = io.connect(config.host, { secure: true });
   socket.on("connect", function () {
     socketId = socket.id;
+    //Join the room
+    socket.emit("joinroom", roomNumber);
 
-    socket.emit('userdetails', 'rajib panja');
     //Remove video element from your browser if received userleft emit from socekt server
     socket.on("user-left", function (id) {
       var video = document.querySelector('[data-socket="' + id + '"]');
-      var parentDiv = video.parentElement;
-      video.parentElement.parentElement.removeChild(parentDiv);
-
-      resizeVideoTiles();
+      if (video != null) {
+        var parentDiv = video.parentElement;
+        video.parentElement.parentElement.removeChild(parentDiv);
+        resizeVideoTiles();
+      }
     });
     ////////////////////////////////////////////////////////////////////////////////////////
-    //When user joined received this event from socket server along with soketid of new joinee and list 
+    //When user joined received this event from socket server along with soketid of new joinee and list
     //When user joined received this event from socket server along with soketid of new joinee and list
     // of all socket client
     socket.on("user-joined", function (id, count, clients) {
@@ -119,14 +146,20 @@ function joinRoom() {
       //when the connection established between two browser
       if (count >= 2) {
         connections[id].createOffer().then(function (description) {
-          connections[id].setLocalDescription(description).then(function () {
-            socket.emit("signal", id, JSON.stringify({ sdp: connections[id].localDescription }));
-          }).catch((e) => console.log(e));
+          connections[id]
+            .setLocalDescription(description)
+            .then(function () {
+              socket.emit(
+                "signal",
+                id,
+                JSON.stringify({ sdp: connections[id].localDescription })
+              );
+            })
+            .catch((e) => console.log(e));
         });
       }
     });
     ///////////////////////////////////////USER JOINED EVENT CLOSED//////////////////////////////////////////////////////////////////////////
-
   });
   //Getting socket messages from PEER
   socket.on("signal", gotMessageFromServer);
@@ -136,8 +169,7 @@ function joinRoom() {
 }
 
 function gotRemoteStream(event, id) {
-
-  console.log('got remote stream');
+  console.log("got remote stream");
   var video = document.createElement("video");
   var div = document.createElement("div");
   div.classList.add("video-container", "pr-1", "pb-1");
@@ -145,7 +177,7 @@ function gotRemoteStream(event, id) {
   video.setAttribute("data-socket", id);
   if (event.stream != null) {
     video.srcObject = event.stream;
-    video.classList.add('d-block', 'w-100', 'h-100');
+    video.classList.add("d-block", "w-100", "h-100");
   }
   video.autoplay = true;
   video.muted = false;
@@ -156,21 +188,24 @@ function gotRemoteStream(event, id) {
   video.onloadeddata = (e) => {
     e.target.play();
     resizeVideoTiles();
-  }
+  };
 }
 
 function resizeVideoTiles() {
-  const tileElms = document.querySelectorAll('.video-container');
+  const tileElms = document.querySelectorAll(".video-container");
   if (tileElms) {
-    const
-      availWidth = document.querySelector('#video-panel-container').clientWidth,
-      availHeight = document.querySelector('#video-panel-container').clientHeight,
-      maxTilesPerRow = Math.ceil(Math.sqrt(tileElms.length)), maxRows = Math.ceil(tileElms.length / maxTilesPerRow),
-      evalTileWidth = availWidth / maxTilesPerRow, evalTileHeight = availHeight / maxRows;
-    let targetTileWidth = 0, targetTileHeight = 0;
-    tileElms.forEach(tileElm => {
-      const
-        videoElm = tileElm.querySelector('video'),
+    const availWidth = document.querySelector("#video-panel-container")
+        .clientWidth,
+      availHeight = document.querySelector("#video-panel-container")
+        .clientHeight,
+      maxTilesPerRow = Math.ceil(Math.sqrt(tileElms.length)),
+      maxRows = Math.ceil(tileElms.length / maxTilesPerRow),
+      evalTileWidth = availWidth / maxTilesPerRow,
+      evalTileHeight = availHeight / maxRows;
+    let targetTileWidth = 0,
+      targetTileHeight = 0;
+    tileElms.forEach((tileElm) => {
+      const videoElm = tileElm.querySelector("video"),
         aspectRatio = videoElm.videoWidth / videoElm.videoHeight;
       if (aspectRatio > 1) {
         if (evalTileHeight < evalTileWidth / aspectRatio) {
@@ -189,8 +224,8 @@ function resizeVideoTiles() {
           targetTileWidth = evalTileHeight * aspectRatio;
         }
       }
-      tileElm.style.width = targetTileWidth + 'px';
-      tileElm.style.height = targetTileHeight + 'px';
+      tileElm.style.width = targetTileWidth + "px";
+      tileElm.style.height = targetTileHeight + "px";
     });
   }
 }
@@ -207,12 +242,23 @@ function gotMessageFromServer(fromId, message) {
         .setRemoteDescription(new RTCSessionDescription(signal.sdp))
         .then(function () {
           if (signal.sdp.type == "offer") {
-            connections[fromId].createAnswer().then(function (description) {
-              connections[fromId].setLocalDescription(description)
-                .then(function () {
-                  socket.emit("signal", fromId, JSON.stringify({ sdp: connections[fromId].localDescription }));
-                }).catch((e) => console.log(e));
-            }).catch((e) => console.log(e));
+            connections[fromId]
+              .createAnswer()
+              .then(function (description) {
+                connections[fromId]
+                  .setLocalDescription(description)
+                  .then(function () {
+                    socket.emit(
+                      "signal",
+                      fromId,
+                      JSON.stringify({
+                        sdp: connections[fromId].localDescription,
+                      })
+                    );
+                  })
+                  .catch((e) => console.log(e));
+              })
+              .catch((e) => console.log(e));
           }
         })
         .catch((e) => console.log(e));
@@ -229,26 +275,26 @@ function gotMessageFromServer(fromId, message) {
 
 function volume_off() {
   localStream.getAudioTracks()[0].enabled = false;
-  document.querySelector("#volume_up").classList.remove('d-none');
-  document.querySelector("#volume_off").classList.add('d-none');
+  document.querySelector("#volume_up").classList.remove("d-none");
+  document.querySelector("#volume_off").classList.add("d-none");
 }
 
 function volume_up() {
   document.getElementById("self-video").muted = false;
   localStream.getAudioTracks()[0].enabled = true;
-  document.querySelector("#volume_up").classList.add('d-none');
-  document.querySelector("#volume_off").classList.remove('d-none');
+  document.querySelector("#volume_up").classList.add("d-none");
+  document.querySelector("#volume_off").classList.remove("d-none");
 }
 
 function videocam_off() {
   localStream.getVideoTracks()[0].enabled = false;
-  document.querySelector("#videocam").classList.remove('d-none');
-  document.querySelector("#videocam_off").classList.add('d-none');
+  document.querySelector("#videocam").classList.remove("d-none");
+  document.querySelector("#videocam_off").classList.add("d-none");
 }
 
 function videocam() {
-  document.querySelector("#videocam").classList.add('d-none');
-  document.querySelector("#videocam_off").classList.remove('d-none');
+  document.querySelector("#videocam").classList.add("d-none");
+  document.querySelector("#videocam_off").classList.remove("d-none");
   localStream.getVideoTracks()[0].enabled = true;
 }
 
