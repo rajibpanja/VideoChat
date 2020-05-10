@@ -70,6 +70,7 @@ function joinRoom() {
   socket.on("connect", function () {
     socketId = socket.id;
 
+     socket.emit('userdetails','rajib panja');
     //Remove video element from your browser if received userleft emit from socekt server
     socket.on("user-left", function (id) {
       var video = document.querySelector('[data-socket="' + id + '"]');
@@ -130,6 +131,9 @@ function joinRoom() {
   });
   //Getting socket messages from PEER
   socket.on("signal", gotMessageFromServer);
+  socket.on("Joineduser-Profile", function (data){
+    alert(data);
+  });
 }
 
 function gotRemoteStream(event, id) {
