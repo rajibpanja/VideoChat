@@ -147,9 +147,9 @@ function gotRemoteStream(event, id) {
     video.srcObject = event.stream;
     video.classList.add('d-block', 'w-100', 'h-100');
   }
-  video.autoplay = true;
-  video.muted = false;
-  video.playsinline = true;
+  video.setAttribute('autoplay', true);
+  video.removeAttribute('muted');
+  video.setAttribute('playsinline', true);
   div.appendChild(video);
   document.getElementById("video-panel").appendChild(div);
 
