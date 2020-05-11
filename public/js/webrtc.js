@@ -136,15 +136,11 @@ async function openUserMedia(e) {
 }
 
 function createRoom() {
-  alert('create room fired');
   //connecting socket check config file for socket server URL
   socket = io.connect(config.host, { secure: true });
-  alert('about to connect');
   socket.on("connect", function () {
-    alert('socket connection successful');
     socket.emit("RoomCreate");
     socket.on("RoomNumber", function (roomNumber) {
-      alert(roomNumber);
       location.href = `${location.origin + location.pathname + '?room=' + roomNumber}`;
     });
   });
