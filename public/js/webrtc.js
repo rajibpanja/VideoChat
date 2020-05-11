@@ -140,7 +140,7 @@ function createRoom() {
   //connecting socket check config file for socket server URL
   socket = io.connect(config.host, { secure: true });
   alert('about to connect');
-  socket.on("connect", () => {
+  socket.on("connect", function () {
     alert('socket connection successful');
     socket.emit("RoomCreate");
     socket.on("RoomNumber", function (roomNumber) {
