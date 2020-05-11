@@ -1,14 +1,32 @@
-#video-panel-container {
-  height: calc(100vh - 6rem);
+.line-height-1 {
+  line-height: 1;
 }
 
-#footer {
+#join-room-box {
+  width: 100%;
+}
+
+#video-header {
+  height: 2rem;
+}
+
+#video-panel-container {
+  height: calc(100vh - 8rem);
+}
+
+#video-panel-footer {
   left: 0;
   bottom: 0;
   height: 6rem;
 }
 
-.video-action {
+.video-panel-action {
   width: 4rem;
   height: 4rem;
+}
+
+@media only screen and (min-width: 992px) {
+  #join-room-box {
+    width: 50%;
+  }
 }

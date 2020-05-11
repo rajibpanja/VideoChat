@@ -18,10 +18,42 @@ var peerConnectionConfig = {
   ],
 };
 
+window.onload = async () => {
+  const queryRoom = getQueryVariable('room');
+  room = queryRoom || 0;
+
+  const homeScreen = document.querySelector('#home-screen');
+  const videoScreen = document.querySelector('#video-screen');
+  const roomUrl = document.querySelector('#room-url');
+
+  if (!room) {
+    homeScreen.classList.remove('d-none');
+    videoScreen.classList.add('d-none');
+  } else {
+    roomUrl.innerHTML = location.href;
+    homeScreen.classList.add('d-none');
+    videoScreen.classList.remove('d-none');
+
+    await openUserMedia();
+    joinRoom(room);
+  }
+}
+
+function getQueryVariable(variable) {
+  var query = window.location.search.substring(1);
+  var vars = query.split('&');
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split('=');
+    if (decodeURIComponent(pair[0]) == variable) {
+      return decodeURIComponent(pair[1]);
+    }
+  }
+  console.log('Query variable %s not found', variable);
+}
+
 //Initialize the Form
 function init() {
   document.querySelector("#hangupBtn").addEventListener("click", hangUp);
-  document.querySelector("#joinBtn").addEventListener("click", openUserMedia);
   document.querySelector("#volume_off").addEventListener("click", volume_off);
   document.querySelector("#volume_up").addEventListener("click", volume_up);
   document.querySelector("#videocam").addEventListener("click", videocam);
@@ -33,6 +65,42 @@ function init() {
   //////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
+function roomJoin(e) {
+  e.preventDefault();
+  const joinRoomInput = document.querySelector('#join-room-input');
+  const roomInputErr = document.querySelector('#room-input-error');
+  const joinUrl = joinRoomInput.value.trim();
+  if (joinUrl) {
+    if (isUrlValid(joinUrl)) {
+      roomInputErr.classList.remove('d-block');
+      location.href = joinUrl;
+    } else {
+      roomInputErr.innerHTML = 'Enter a valid Room URL.';
+      roomInputErr.classList.add('d-block');
+    }
+  } else {
+    roomInputErr.innerHTML = 'Enter a Room URL to join.';
+    roomInputErr.classList.add('d-block');
+  }
+}
+
+function isUrlValid(url) {
+  var res = url.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+  if (res == null)
+    return false;
+  else
+    return true;
+}
+
+function copyRoomUrlToClipboard() {
+  var range = document.createRange();
+  range.selectNode(document.getElementById("room-url"));
+  window.getSelection().removeAllRanges(); // clear current selection
+  window.getSelection().addRange(range); // to select text
+  document.execCommand("copy");
+  window.getSelection().removeAllRanges();// to deselect
+}
+
 //Close conference from your browser
 function hangUp() {
   connections.forEach(function (socketListId) {
@@ -41,8 +109,8 @@ function hangUp() {
     }
   });
   if (socket != null) socket.close();
-  //NEED TO DO BETTER OPTION
-  location.reload();
+  
+  location.href = location.origin + location.pathname;
 }
 
 //Open Microphone and Camera from your browser
@@ -60,10 +128,8 @@ async function openUserMedia(e) {
   document.querySelector("#volume_up").classList.add("d-none");
   document.querySelector("#volume_off").classList.remove("d-none");
   document.querySelector("#hangupBtn").classList.remove("d-none");
-  document.querySelector("#joinBtn").classList.add("d-none");
 
   //Join conferecne call and send the peer connection details to other participent via SOCKET request
-  joinRoom('123456');
   selfVideoElm.onloadeddata = () => {
     resizeVideoTiles();
   };
@@ -71,24 +137,17 @@ async function openUserMedia(e) {
 
 function createRoom() {
   //connecting socket check config file for socket server URL
-  roomsocket = io.connect(config.host, { secure: true });
-  roomsocket.on("connect", function () {
-    roomsocket.emit("RoomCreate");
-    roomsocket.on("RoomNumber", function (roomNumber) {
-      room = roomNumber;
+  socket = io.connect(config.host, { secure: true });
+  socket.on("connect", function () {
+    socket.emit("RoomCreate");
+    socket.on("RoomNumber", async function (roomNumber) {
+      location.href = `${location.origin + location.pathname + '?room=' + roomNumber}`;
     });
   });
- 
-  //Setting time interval for populate the ROOM DOUBLE CHECKING 
-  setTimeout(() => {
-    roomsocket.disconnect();
-    
-  }, 2000);
 }
 
 function joinRoom(roomNumber) {
   document.querySelector("#hangupBtn").disabled = false;
-  document.querySelector("#joinBtn").disabled = true;
   document.querySelector("#volume_off").disabled = false;
 
   //connecting socket check config file for socket server URL
@@ -187,7 +246,7 @@ function gotRemoteStream(event, id) {
   console.log("got remote stream");
   var video = document.createElement("video");
   var div = document.createElement("div");
-  div.classList.add("video-tile", "m-1");
+  div.classList.add("video-tile", "p-1");
 
   video.setAttribute("data-socket", id);
   if (event.stream != null) {
@@ -207,20 +266,17 @@ function gotRemoteStream(event, id) {
 }
 
 function resizeVideoTiles() {
-  const tileElms = document.querySelectorAll(".video-container");
+  const tileElms = document.querySelectorAll('.video-tile');
   if (tileElms) {
-    const availWidth = document.querySelector("#video-panel-container")
-        .clientWidth,
-      availHeight = document.querySelector("#video-panel-container")
-        .clientHeight,
-      maxTilesPerRow = Math.ceil(Math.sqrt(tileElms.length)),
-      maxRows = Math.ceil(tileElms.length / maxTilesPerRow),
-      evalTileWidth = availWidth / maxTilesPerRow,
-      evalTileHeight = availHeight / maxRows;
-    let targetTileWidth = 0,
-      targetTileHeight = 0;
-    tileElms.forEach((tileElm) => {
-      const videoElm = tileElm.querySelector("video"),
+    const
+      availWidth = document.querySelector('#video-panel-container').clientWidth,
+      availHeight = document.querySelector('#video-panel-container').clientHeight,
+      maxTilesPerRow = Math.ceil(Math.sqrt(tileElms.length)), maxRows = Math.ceil(tileElms.length / maxTilesPerRow),
+      evalTileWidth = availWidth / maxTilesPerRow, evalTileHeight = availHeight / maxRows;
+    let targetTileWidth = 0, targetTileHeight = 0, renderedTileMinHeight = 0;
+    tileElms.forEach(tileElm => {
+      const
+        videoElm = tileElm.querySelector('video'),
         aspectRatio = videoElm.videoWidth / videoElm.videoHeight;
       if (aspectRatio > 1) {
         if (evalTileHeight < evalTileWidth / aspectRatio) {
@@ -239,8 +295,22 @@ function resizeVideoTiles() {
           targetTileWidth = evalTileHeight * aspectRatio;
         }
       }
-      tileElm.style.width = targetTileWidth + "px";
-      tileElm.style.height = targetTileHeight + "px";
+      tileElm.style.width = targetTileWidth + 'px';
+      tileElm.style.height = targetTileHeight + 'px';
+      if (!renderedTileMinHeight || renderedTileMinHeight > targetTileHeight) {
+        renderedTileMinHeight = Math.floor(targetTileHeight);
+      }
+    });
+    tileElms.forEach(tileElm => {
+      const tileHeight = tileElm.offsetHeight;
+      if (tileHeight > renderedTileMinHeight) {
+        const
+          videoElm = tileElm.querySelector('video'),
+          aspectRatio = videoElm.videoWidth / videoElm.videoHeight;
+        let targetTileWidth = renderedTileMinHeight * aspectRatio;
+        tileElm.style.width = targetTileWidth + 'px';
+        tileElm.style.height = renderedTileMinHeight + 'px';
+      }
     });
   }
 }

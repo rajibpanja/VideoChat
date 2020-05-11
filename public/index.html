@@ -15,59 +15,107 @@
 </head>
 
 <body class="bg-dark">
-	<main id="main">
-		<div id="video-panel-container">
-			<div id="video-panel" class="d-flex align-items-center justify-content-center flex-wrap">
-				<div class="video-tile m-1">
-					<video id="self-video" muted autoplay playsinline class="d-block w-100 h-100"></video>
+	<main>
+		<section id="home-screen" class="d-none">
+			<div class="p-3 my-5 text-center text-light">
+				<h1 class="mb-5">Welcome to Video Chat</h1>
+				<h2 class="font-weight-light pt-5">Add Room</h2>
+				<button type="button" class="btn btn-lg btn-primary" onclick="createRoom()">
+					<span>Create New</span>
+				</button>
+				<div class="d-flex align-items-center justify-content-center my-5">
+					<div class="w-25 border border-secondary"></div>
+					<div class="small text-secondary mx-2">OR</div>
+					<div class="w-25 border border-secondary"></div>
+				</div>
+				<h2 class="font-weight-light">Join Room</h2>
+				<form class="d-flex justify-content-center" onsubmit="roomJoin(event)">
+					<div class="input-group" id="join-room-box">
+						<input type="text" id="join-room-input" class="form-control bg-transparent text-light rounded-0"
+							placeholder="Room URL">
+						<div class="input-group-append">
+							<div class="input-group-text rounded-0 p-0">
+								<button type="submit" class="btn btn-lg btn-primary rounded-0">
+									<i class="material-icons mt-1">arrow_forward</i>
+								</button>
+							</div>
+						</div>
+						<div id="room-input-error" class="invalid-feedback"></div>
+					</div>
+				</form>
+			</div>
+		</section>
+		<section id="video-screen" class="d-none">
+			<div id="video-header" class="bg-secondary text-white">
+				<div class="d-flex align-items-center justify-content-center p-1 small">
+					<i class="material-icons mr-2">settings_input_antenna</i>
+					<div class="font-weight-bold mr-1">Room:</div>
+					<div id="room-url" class="text-truncate mr-2"></div>
+					<button type="button" class="btn btn-sm btn-primary line-height-1" id="room-copy"
+						onclick="copyRoomUrlToClipboard()">
+						<span class="d-flex align-items-center">
+							<i class="material-icons small">assignment</i>
+							<small class="ml-1 d-none d-lg-block">Copy</small>
+						</span>
+					</button>
+					<div class="mx-1"></div>
+					<button type="button" class="btn btn-sm btn-primary line-height-1">
+						<span class="d-flex align-items-center">
+							<i class="material-icons small">share</i>
+							<small class="ml-1 d-none d-lg-block">Share</small>
+						</span>
+					</button>
 				</div>
 			</div>
-		</div>
+			<div id="video-panel-container">
+				<div id="video-panel" class="d-flex align-items-center justify-content-center flex-wrap">
+					<div class="video-tile p-1">
+						<video id="self-video" muted autoplay playsinline class="d-block w-100 h-100"></video>
+					</div>
+				</div>
+			</div>
+			<div id="video-panel-footer" class="position-fixed w-100 p-3">
+				<div class="d-flex align-items-center justify-content-center">
+					<button class="btn btn-success rounded-circle video-panel-action mr-2 d-none" id="volume_off">
+						<div class="d-flex flex-column">
+							<i class="material-icons">volume_off</i>
+							<div class="small">MUTE</div>
+						</div>
+					</button>
+					<button class="btn btn-danger rounded-circle video-panel-action mr-2 d-none" id="volume_up">
+						<div class="d-flex flex-column">
+							<i class="material-icons">volume_up</i>
+							<div class="small">AUDIO</div>
+						</div>
+					</button>
+					<button class="btn btn-danger rounded-circle video-panel-action mr-2 d-none" id="videocam">
+						<div class="d-flex flex-column">
+							<i class="material-icons">videocam</i>
+							<div class="small">VIDEO</div>
+						</div>
+					</button>
+					<button class="btn btn-success rounded-circle video-panel-action mr-2 d-none" id="videocam_off">
+						<div class="d-flex flex-column">
+							<i class="material-icons">videocam_off</i>
+							<div class="small">HIDE</div>
+						</div>
+					</button>
+					<button class="btn btn-outline-primary rounded-circle video-panel-action mr-2" id="chat">
+						<div class="d-flex flex-column">
+							<i class="material-icons">comment</i>
+							<div class="small">CHAT</div>
+						</div>
+					</button>
+					<button class="btn btn-danger rounded-circle video-panel-action d-none" id="hangupBtn">
+						<div class="d-flex flex-column">
+							<i class="material-icons">close</i>
+							<div class="small">EXIT</div>
+						</div>
+					</button>
+				</div>
+			</div>
+		</section>
 	</main>
-	<footer id="footer" class="position-fixed w-100 p-3">
-		<div class="d-flex align-items-center justify-content-center">
-			<button class="btn btn-primary rounded-circle video-action" id="joinBtn">
-				<div class="d-flex flex-column">
-					<i class="material-icons">group</i>
-					<div class="small">JOIN</div>
-				</div>
-			</button>
-			<button class="btn btn-success rounded-circle video-action mr-2 d-none" id="volume_off">
-				<div class="d-flex flex-column">
-					<i class="material-icons">volume_off</i>
-					<div class="small">MUTE</div>
-				</div>
-			</button>
-			<button class="btn btn-danger rounded-circle video-action mr-2 d-none" id="volume_up">
-				<div class="d-flex flex-column">
-					<i class="material-icons">volume_up</i>
-					<div class="small">AUDIO</div>
-				</div>
-			</button>
-			<button class="btn btn-danger rounded-circle video-action mr-2 d-none" id="videocam">
-				<div class="d-flex flex-column">
-					<i class="material-icons">videocam</i>
-					<div class="small">VIDEO</div>
-				</div>
-			</button>
-			<button class="btn btn-success rounded-circle video-action mr-2 d-none" id="videocam_off">
-				<div class="d-flex flex-column">
-					<i class="material-icons">videocam_off</i>
-					<div class="small">HIDE</div>
-				</div>
-			</button>
-			<button class="btn btn-danger rounded-circle video-action d-none" id="hangupBtn">
-				<div class="d-flex flex-column">
-					<i class="material-icons">close</i>
-					<div class="small">EXIT</div>
-				</div>
-			</button>
-			<br>
-
-		</div>
-		<!-- ////////////////////////////////////////////////////////////////////////-->
-
-	</footer>
 
 
 	<script src="socket.io/socket.io.js"></script>
