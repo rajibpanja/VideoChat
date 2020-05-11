@@ -6,7 +6,10 @@ var localStream;
 var connections = [];
 var socket;
 var remoteStream;
+var room = 0;
+var joinUserlist = []; //for chatting purpose
 
+//STUN server for relay
 var peerConnectionConfig = {
   iceServers: [
     { urls: "stun:stun.services.mozilla.com" },
@@ -22,11 +25,12 @@ function init() {
   document.querySelector("#volume_off").addEventListener("click", volume_off);
   document.querySelector("#volume_up").addEventListener("click", volume_up);
   document.querySelector("#videocam").addEventListener("click", videocam);
-  document
-    .querySelector("#videocam_off")
-    .addEventListener("click", videocam_off);
-
+  document.querySelector("#videocam_off").addEventListener("click", videocam_off);
   window.addEventListener("resize", resizeVideoTiles);
+  //////////////////////////////CHAT IMPLEMENTATION CONTROL REGISTRATION///////////////////////////////
+  
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 //Close conference from your browser
@@ -37,7 +41,7 @@ function hangUp() {
     }
   });
   if (socket != null) socket.close();
-  //NEED TO DO --RUPAM
+  //NEED TO DO BETTER OPTION
   location.reload();
 }
 
@@ -47,7 +51,6 @@ async function openUserMedia(e) {
     video: true,
     audio: true,
   });
-
   localStream = stream;
   remoteStream = new MediaStream();
   const selfVideoElm = document.querySelector("#self-video");
@@ -60,7 +63,7 @@ async function openUserMedia(e) {
   document.querySelector("#joinBtn").classList.add("d-none");
 
   //Join conferecne call and send the peer connection details to other participent via SOCKET request
-  joinRoom(document.getElementById("tbxroomid").value);
+  joinRoom('123456');
   selfVideoElm.onloadeddata = () => {
     resizeVideoTiles();
   };
@@ -68,23 +71,19 @@ async function openUserMedia(e) {
 
 function createRoom() {
   //connecting socket check config file for socket server URL
-  var room=0;
-  socket = io.connect(config.host, { secure: true });
-  socket.on("connect", function () {
-    socket.emit("RoomCreate");
-    socket.on("RoomNumber", function (roomNumber) {
-      
-      room=roomNumber;
-      
+  roomsocket = io.connect(config.host, { secure: true });
+  roomsocket.on("connect", function () {
+    roomsocket.emit("RoomCreate");
+    roomsocket.on("RoomNumber", function (roomNumber) {
+      room = roomNumber;
     });
-   
   });
-  //Setting time interval for populate the value 
-  setTimeout (()=>{
-    socket.disconnect();
-    alert(room);
-  },2000);
+ 
+  //Setting time interval for populate the ROOM DOUBLE CHECKING 
+  setTimeout(() => {
+    roomsocket.disconnect();
     
+  }, 2000);
 }
 
 function joinRoom(roomNumber) {
@@ -98,8 +97,15 @@ function joinRoom(roomNumber) {
     socketId = socket.id;
     //Join the room
     socket.emit("joinroom", roomNumber);
+    //Share name with other room member
+    socket.emit("nameshare", roomNumber, "name");
+    //Populate  join userdetails from SOCKET IO
+    socket.on("joinusername", (usrname, socketid) => {
+      var obj = { name: usrname, sid: socketid };
+      joinUserlist.push(obj);
+    });
 
-    //Remove video element from your browser if received userleft emit from socekt server
+    //Remove video element from your browser if received userleft emit from socket server
     socket.on("user-left", function (id) {
       var video = document.querySelector('[data-socket="' + id + '"]');
       if (video != null) {
@@ -107,6 +113,8 @@ function joinRoom(roomNumber) {
         video.parentElement.parentElement.removeChild(parentDiv);
         resizeVideoTiles();
       }
+      //Remove user from userlist array
+      removeUser(id);
     });
     ////////////////////////////////////////////////////////////////////////////////////////
     //When user joined received this event from socket server along with soketid of new joinee and list
@@ -118,6 +126,7 @@ function joinRoom(roomNumber) {
           connections[socketListId] = new RTCPeerConnection(
             peerConnectionConfig
           );
+
           //Adding local video and audio track to all the clients peer connections
           localStream.getTracks().forEach((track) => {
             connections[socketListId].addTrack(track, localStream);
@@ -161,11 +170,17 @@ function joinRoom(roomNumber) {
     });
     ///////////////////////////////////////USER JOINED EVENT CLOSED//////////////////////////////////////////////////////////////////////////
   });
-  //Getting socket messages from PEER
+
+
+  //Getting socket multimedia related messages from PEER
   socket.on("signal", gotMessageFromServer);
-  // socket.on("Joineduser-Profile", function (data){
-  //   alert(data);
-  // });
+
+  //Receive chat message
+  socket.on("receivedmessage", (message) => {
+   console.log(message);
+   //Populate message in chat window
+
+  });
 }
 
 function gotRemoteStream(event, id) {
@@ -179,9 +194,9 @@ function gotRemoteStream(event, id) {
     video.srcObject = event.stream;
     video.classList.add("d-block", "w-100", "h-100");
   }
-  video.setAttribute('autoplay', true);
-  video.removeAttribute('muted');
-  video.setAttribute('playsinline', true);
+  video.setAttribute("autoplay", true);
+  video.removeAttribute("muted");
+  video.setAttribute("playsinline", true);
   div.appendChild(video);
   document.getElementById("video-panel").appendChild(div);
 
@@ -235,7 +250,7 @@ function gotMessageFromServer(fromId, message) {
   //Parse the incoming signal
   var signal = JSON.parse(message);
 
-  //Make sure it's not coming from yourself
+  //Make sure it's not coming from same browser
   if (fromId != socketId) {
     if (signal.sdp) {
       connections[fromId]
@@ -299,3 +314,24 @@ function videocam() {
 }
 
 init();
+
+//Remove user from room
+function removeUser(userSocketID) { 
+  // joinUserlist.forEach(item,())
+  // var index = arr.indexOf(value);
+  // if (index > -1) {
+  //     arr.splice(index, 1);
+  // }
+  // return arr;
+}
+
+//Chat message sending feature
+function sendMessage() {
+  // var message = messageInputBox.value;
+  // socket.emit("messagetoAll", document.getElementById('tbxroomid').value, message);
+  // messageInputBox.value = "";
+  // messageInputBox.focus();
+  
+}
+
+

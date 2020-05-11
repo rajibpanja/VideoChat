@@ -26,6 +26,11 @@ io.on("connection", function (socket) {
     );
   });
 
+  socket.on('nameshare',(room,username)=>{
+    io.in(room).emit('joinusername',username,socket.id);
+  });
+  
+
   socket.on("signal", (toId, message) => {
     io.to(toId).emit("signal", socket.id, message);
   });
@@ -33,6 +38,11 @@ io.on("connection", function (socket) {
   socket.on("RoomCreate", function () {
     roomNumber = Math.floor(100000 + Math.random() * 900000);
     socket.emit("RoomNumber", roomNumber);
+  });
+
+  socket.on("messagetoAll", (room, message)=>{
+    console.log(room + '-'+ message);
+    io.in(room).emit('receivedmessage',message);
   });
 
   //When client disconnect send the signal to other participent with disconnected client's socketid via user-left event
