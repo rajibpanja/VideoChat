@@ -60,7 +60,7 @@ function init() {
   document.querySelector("#videocam_off").addEventListener("click", videocam_off);
   window.addEventListener("resize", resizeVideoTiles);
   //////////////////////////////CHAT IMPLEMENTATION CONTROL REGISTRATION///////////////////////////////
-  
+
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
 }
@@ -109,7 +109,7 @@ function hangUp() {
     }
   });
   if (socket != null) socket.close();
-  
+
   location.href = location.origin + location.pathname;
 }
 
@@ -140,7 +140,8 @@ function createRoom() {
   socket = io.connect(config.host, { secure: true });
   socket.on("connect", function () {
     socket.emit("RoomCreate");
-    socket.on("RoomNumber", async function (roomNumber) {
+    socket.on("RoomNumber", function (roomNumber) {
+      alert(roomNumber);
       location.href = `${location.origin + location.pathname + '?room=' + roomNumber}`;
     });
   });
@@ -236,8 +237,8 @@ function joinRoom(roomNumber) {
 
   //Receive chat message
   socket.on("receivedmessage", (message) => {
-   console.log(message);
-   //Populate message in chat window
+    console.log(message);
+    //Populate message in chat window
 
   });
 }
@@ -386,7 +387,7 @@ function videocam() {
 init();
 
 //Remove user from room
-function removeUser(userSocketID) { 
+function removeUser(userSocketID) {
   // joinUserlist.forEach(item,())
   // var index = arr.indexOf(value);
   // if (index > -1) {
@@ -401,7 +402,7 @@ function sendMessage() {
   // socket.emit("messagetoAll", document.getElementById('tbxroomid').value, message);
   // messageInputBox.value = "";
   // messageInputBox.focus();
-  
+
 }
 
 
