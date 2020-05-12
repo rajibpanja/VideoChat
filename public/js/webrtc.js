@@ -365,7 +365,7 @@ function volume_off() {
 }
 
 function volume_up() {
-  document.getElementById("self-video").muted = false;
+  // document.getElementById("self-video").muted = false;
   localStream.getAudioTracks()[0].enabled = true;
   document.querySelector("#volume_up").classList.add("d-none");
   document.querySelector("#volume_off").classList.remove("d-none");
