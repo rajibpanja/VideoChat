@@ -25,12 +25,14 @@ window.onload = async () => {
   const homeScreen = document.querySelector('#home-screen');
   const videoScreen = document.querySelector('#video-screen');
   const roomUrl = document.querySelector('#room-url');
+  const roomId = document.querySelector('#room-id');
 
   if (!room) {
     homeScreen.classList.remove('d-none');
     videoScreen.classList.add('d-none');
   } else {
     roomUrl.innerHTML = location.href;
+    roomId.innerHTML = room;
     homeScreen.classList.add('d-none');
     videoScreen.classList.remove('d-none');
 
@@ -69,32 +71,19 @@ function roomJoin(e) {
   e.preventDefault();
   const joinRoomInput = document.querySelector('#join-room-input');
   const roomInputErr = document.querySelector('#room-input-error');
-  const joinUrl = joinRoomInput.value.trim();
-  if (joinUrl) {
-    if (isUrlValid(joinUrl)) {
-      roomInputErr.classList.remove('d-block');
-      location.href = joinUrl;
-    } else {
-      roomInputErr.innerHTML = 'Enter a valid Room URL.';
-      roomInputErr.classList.add('d-block');
-    }
+  const roomNumber = joinRoomInput.value.toString();
+  if (roomNumber) {
+    roomInputErr.classList.remove('d-block');
+    location.href = `${location.origin + location.pathname + '?room=' + roomNumber}`;
   } else {
-    roomInputErr.innerHTML = 'Enter a Room URL to join.';
+    roomInputErr.innerHTML = 'Enter a room number to join.';
     roomInputErr.classList.add('d-block');
   }
 }
 
-function isUrlValid(url) {
-  var res = url.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
-  if (res == null)
-    return false;
-  else
-    return true;
-}
-
-function copyRoomUrlToClipboard() {
+function copyRoomToClipboard(selector) {
   var range = document.createRange();
-  range.selectNode(document.getElementById("room-url"));
+  range.selectNode(document.getElementById(selector));
   window.getSelection().removeAllRanges(); // clear current selection
   window.getSelection().addRange(range); // to select text
   document.execCommand("copy");

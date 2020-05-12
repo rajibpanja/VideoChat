@@ -6,12 +6,24 @@
   width: 100%;
 }
 
+/* Chrome, Safari, Edge, Opera */
+#join-room-input::-webkit-outer-spin-button,
+#join-room-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+#join-room-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 #video-header {
-  height: 2rem;
+  height: 3rem;
 }
 
 #video-panel-container {
-  height: calc(100vh - 8rem);
+  height: calc(100vh - 9rem);
 }
 
 #video-panel-footer {

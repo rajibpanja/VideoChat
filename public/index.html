@@ -6,11 +6,21 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
 		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<link rel="stylesheet" href="./css/main.css">
+
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+		integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+		crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+		integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+		crossorigin="anonymous"></script>
+	<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 
 </head>
 
@@ -31,8 +41,8 @@
 				<h2 class="font-weight-light">Join Room</h2>
 				<form class="d-flex justify-content-center" onsubmit="roomJoin(event)">
 					<div class="input-group" id="join-room-box">
-						<input type="text" id="join-room-input" class="form-control bg-transparent text-light rounded-0"
-							placeholder="Room URL">
+						<input type="number" id="join-room-input" class="form-control bg-transparent text-light rounded-0"
+							placeholder="Room number">
 						<div class="input-group-append">
 							<div class="input-group-text rounded-0 p-0">
 								<button type="submit" class="btn btn-lg btn-primary rounded-0">
@@ -46,25 +56,34 @@
 			</div>
 		</section>
 		<section id="video-screen" class="d-none">
-			<div id="video-header" class="bg-secondary text-white">
-				<div class="d-flex align-items-center justify-content-center p-1 small">
-					<i class="material-icons mr-2">settings_input_antenna</i>
+			<div id="video-header" class="bg-secondary text-white p-1 small">
+				<div id="room-url" class="text-center text-truncate"></div>
+				<div class="d-flex align-items-center justify-content-center">
 					<div class="font-weight-bold mr-1">Room:</div>
-					<div id="room-url" class="text-truncate mr-2"></div>
-					<button type="button" class="btn btn-sm btn-primary line-height-1" id="room-copy"
-						onclick="copyRoomUrlToClipboard()">
-						<span class="d-flex align-items-center">
+					<div id="room-id" class="text-truncate mr-2"></div>
+					<div class="dropdown">
+						<button class="btn btn-sm btn-primary line-height-1 dropdown-toggle p-1 d-flex align-items-center"
+							type="button" id="copy-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<i class="material-icons small">assignment</i>
 							<small class="ml-1 d-none d-lg-block">Copy</small>
-						</span>
-					</button>
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="copy-btn">
+							<a class="dropdown-item small" href="javascript:void(0)" onclick="copyRoomToClipboard('room-url')">Room
+								url</a>
+							<a class="dropdown-item small" href="javascript:void(0)" onclick="copyRoomToClipboard('room-id')">Room
+								number</a>
+						</div>
+					</div>
 					<div class="mx-1"></div>
-					<button type="button" class="btn btn-sm btn-primary line-height-1">
-						<span class="d-flex align-items-center">
+					<div class="dropdown">
+						<button class="btn btn-sm btn-primary line-height-1 dropdown-toggle p-1 d-flex align-items-center"
+							type="button" id="share-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<i class="material-icons small">share</i>
 							<small class="ml-1 d-none d-lg-block">Share</small>
-						</span>
-					</button>
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="share-btn">
+						</div>
+					</div>
 				</div>
 			</div>
 			<div id="video-panel-container">
