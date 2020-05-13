@@ -2,6 +2,17 @@
   line-height: 1;
 }
 
+.material-icons.small {
+  font-size: 80%;
+}
+
+.toast {
+  position: fixed;
+  right: 0.5rem;
+  min-width: 15rem;
+  top: 3.5rem;
+}
+
 #join-room-box {
   width: 100%;
 }
