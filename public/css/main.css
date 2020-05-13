@@ -60,6 +60,43 @@
   height: 4rem;
 }
 
+#chat-dialog-body {
+  min-height: calc(100vh - 12rem);
+}
+
+.chat-tile-group {
+  margin-bottom: 0.5rem;
+}
+
+.chat-tile-container {
+  margin-bottom: 0.25rem;
+}
+
+.chat-tile {
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+  font-size: 90%;
+  max-width: 75%;
+  line-height: 1.25;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  display: inline-block;
+  border-radius: 1rem;
+  background-color: #f8f9fa;
+  color: #000000;
+}
+
+.chat-tile.self {
+  background-color: #007bff;
+  color: #ffffff;
+}
+
+.chat-time {
+  float: right;
+  margin: 10px 0 -5px 5px;
+  opacity: 0.5;
+  font-size: 70%;
+}
+
 @media only screen and (min-width: 992px) {
   #join-room-box {
     width: 50%;

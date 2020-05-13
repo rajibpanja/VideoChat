@@ -126,8 +126,8 @@
 							<div class="small">HIDE</div>
 						</div>
 					</button>
-					<button class="btn btn-outline-primary rounded-circle video-panel-action mr-2" id="chat" data-toggle="tooltip"
-						data-placement="top" title="Chat with all">
+					<button class="btn btn-outline-primary rounded-circle video-panel-action mr-2" id="chat" data-toggle="modal"
+						data-target="#exampleModal">
 						<div class="d-flex flex-column">
 							<i class="material-icons">comment</i>
 							<div class="small">CHAT</div>
@@ -151,6 +151,84 @@
 				</div>
 				<div class="toast-body">
 					Copied to clipboard.
+				</div>
+			</div>
+			<!-- Modal -->
+			<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header bg-light">
+							<h5 class="modal-title d-flex align-items-center justify-content-center">
+								<i class="material-icons mr-3">comment</i>
+								<div>Manish Subramanium</div>
+							</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">
+									<i class="material-icons">close</i>
+								</span>
+							</button>
+						</div>
+						<div class="modal-body overflow-auto" id="chat-dialog-body">
+							<div class="chat-tile-group">
+								<div class="chat-tile-container">
+									<div class="chat-tile">
+										Hi
+										<div class="chat-time">12:00 AM</div>
+									</div>
+								</div>
+								<div class="chat-tile-container">
+									<div class="chat-tile">
+										Can you help me with few details?
+										<div class="chat-time">12:00 AM</div>
+									</div>
+								</div>
+							</div>
+							<div class="chat-tile-group">
+								<div class="chat-tile-container text-right">
+									<div class="chat-tile self">
+										Sure.
+										<div class="chat-time">12:00 AM</div>
+									</div>
+								</div>
+								<div class="chat-tile-container text-right">
+									<div class="chat-tile self">
+										Tell me how can I can help you?
+										<div class="chat-time">12:00 AM</div>
+									</div>
+								</div>
+							</div>
+							<div class="chat-tile-group">
+								<div class="chat-tile-container">
+									<div class="chat-tile">
+										May I know how many more participants are about to join?
+										<div class="chat-time">12:00 AM</div>
+									</div>
+								</div>
+							</div>
+							<div class="chat-tile-group">
+								<div class="chat-tile-container text-right">
+									<div class="chat-tile self">
+										There would be another 3 folks to be joining.
+										<div class="chat-time">12:00 AM</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer bg-light">
+							<div class="input-group">
+								<div contenteditable class="form-control rounded-lg h-auto border-0" placeholder="Type a message">
+								</div>
+								<div class="input-group-append">
+									<div class="input-group-text border-0 bg-transparent py-0 pr-0">
+										<button type="button"
+											class="btn btn-primary bg-transparent text-primary border-0 px-0 d-flex h-100">
+											<i class="material-icons">send</i>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>
