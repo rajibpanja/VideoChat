@@ -61,6 +61,7 @@ function init() {
   document.querySelector("#videocam").addEventListener("click", videocam);
   document.querySelector("#videocam_off").addEventListener("click", videocam_off);
   window.addEventListener("resize", resizeVideoTiles);
+  loadTooltips();
   //////////////////////////////CHAT IMPLEMENTATION CONTROL REGISTRATION///////////////////////////////
 
 
@@ -123,6 +124,7 @@ async function openUserMedia(e) {
   //Join conferecne call and send the peer connection details to other participent via SOCKET request
   selfVideoElm.onloadeddata = () => {
     resizeVideoTiles();
+    loadTooltips();
   };
 }
 
@@ -237,7 +239,28 @@ function gotRemoteStream(event, id) {
   console.log("got remote stream");
   var video = document.createElement("video");
   var div = document.createElement("div");
-  div.classList.add("video-tile", "p-1");
+  div.classList.add("video-tile", "p-1", "position-relative");
+  div.innerHTML = `
+    <div class="video-tile-actions position-absolute w-100">
+      <div class="d-flex align-items-center justify-content-end p-2">
+        <button type="button"
+          class="btn btn-sm btn-outline-success bg-transparent rounded-circle mr-2 video-tile-action d-none"
+          data-toggle="tooltip" data-placement="bottom" title="Unmute this participant">
+          <i class="material-icons mt-1">mic</i>
+        </button>
+        <button type="button"
+          class="btn btn-sm btn-outline-danger bg-transparent rounded-circle mr-2 video-tile-action"
+          data-toggle="tooltip" data-placement="bottom" title="Mute this participant">
+          <i class="material-icons mt-1">mic_off</i>
+        </button>
+        <button type="button" 
+          class="btn btn-sm btn-outline-primary bg-transparent rounded-circle video-tile-action"
+          data-toggle="tooltip" data-placement="bottom" title="Chat with this participant">
+          <i class="material-icons mt-1">comment</i>
+        </button>
+      </div>
+    </div>
+  `;
 
   video.setAttribute("data-socket", id);
   if (event.stream != null) {
@@ -253,6 +276,7 @@ function gotRemoteStream(event, id) {
   video.onloadeddata = (e) => {
     e.target.play();
     resizeVideoTiles();
+    loadTooltips();
   };
 }
 
@@ -395,4 +419,6 @@ function sendMessage() {
 
 }
 
-
+function loadTooltips() {
+  $('[data-toggle="tooltip"]').tooltip();
+}

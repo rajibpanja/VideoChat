@@ -33,6 +33,17 @@
   height: 3rem;
 }
 
+.video-tile-actions {
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+.video-tile-action {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
 #video-panel-container {
   height: calc(100vh - 9rem);
 }
